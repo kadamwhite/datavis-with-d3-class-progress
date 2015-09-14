@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Untitled Works in the MoMA Collection</title>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+</head>
+<body>
+<svg width="540" height="520">
+<style type="text/css">
+polygon, rect, ellipse, outline, line {
+  stroke: #35312B;
+  stroke-width: 2;
+};
+</style>
+
+<!-- Frame and background -->
+<rect fill="#2C2C2A" width="540" height="504"/>
+<rect fill="#544A3A" x="9" y="6" width="523" height="490"/>
+
+<!-- Mid-tone shapes -->
+<polygon fill="#413828" points="217,496 231,404 303,413 417,367 456,217 532,210 532,496"/>
+<polygon fill="#413828" points="9,82 151,102 181,87 224,72 368,24 380,7 9,7"/>
+<polygon fill="#413828" points="472,6 453,25 469,102 513,154 533,151 532,5"/>
+<polygon fill="#544932" points="9,387 157,279 123,206 9,188"/>
+
+<!-- Concentric ellipses -->
+<ellipse fill="#9E895D" cx="264" cy="200" rx="126" ry="112"/>
+<ellipse fill="#686051" cx="253" cy="216" rx="95"  ry="78"/>
+<ellipse fill="#605643" cx="237" cy="221" rx="70"  ry="61"/>
+<ellipse fill="#87795D" cx="233" cy="217" rx="61"  ry="49"/>
+<ellipse fill="#E1DCCB" cx="230" cy="216" rx="53"  ry="44"/>
+<ellipse fill="black"   cx="229" cy="216" rx="49"  ry="40"/>
+
+<!-- more detail -->
+<polygon fill="#544932" points="227,400 232,368 230,324 270,332 313,324 362,296 375,261 375,223 369,210 453,220 413,374 300,418"/>
+<line x1="277" y1="197" x2="533" y2="151"/>
+<line x1="208" y1="251" x2="150" y2="496"/>
+<line x1="270" y1="333" x2="303" y2="414"/>
+<line x1="308" y1="418" x2="308" y2="496"/>
+<line x1="413" y1="375" x2="532" y2="496"/>
+<line x1="270" y1="333" x2="270" y2="314"/>
+<line x1="134" y1="297" x2="178" y2="374"/>
+<line x1="473" y1="6"   x2="348" y2="118"/>
+<line x1="381" y1="7"   x2="312" y2="108"/>
+<line x1="370" y1="210" x2="348" y2="210"/>
+<line x1="294" y1="260" x2="353" y2="282"/>
+<line x1="167" y1="174" x2="9"   y2="138"/>
+<line x1="203" y1="80"  x2="191" y2="3"/>
+<line x1="150" y1="108" x2="116" y2="205"/>
+<line x1="138" y1="313" x2="9"   y2="409"/>
+<line x1="294" y1="418" x2="287" y2="496"/>
+<line x1="230" y1="324" x2="158" y2="279"/>
+
+<!-- Dark overlays -->
+<polygon fill="#2E2B23" points="253,413 247,496 217,496 231,404"/>
+<polygon fill="#2E2B23" points="400,379 506,496 532,496 413,374"/>
+<polygon fill="#2E2B23" points="426,335 532,373 532,302 438,288"/>
+<polygon fill="#2E2B23" points="311,460 396,450 413,418 396,387 315,413"/>
+<polygon fill="#2E2B23" points="80,205 80,256 106,305 150,279 119,210"/>
+<polygon fill="#2E2B23" points="163,438 184,450 176,496 150,496"/>
+<polygon fill="#2E2B23" points="88,156 80,163 9,154 9,137"/>
+<polygon fill="#2E2B23" points="340,107 439,13 453,19 353,114"/>
+
+</svg>
+<p>Lee Bontecou, <a href="http://www.moma.org/collection/works/80745"><em>Untitled</em>, 1959</a></p>
+<script type="text/javascript">
+d3.csv('untitled.csv', function(artworks) {
+  console.log(artworks);
+});
+</script>
+</body>
+</html>
