@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Untitled Works in the MoMA Collection</title>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+</head>
+<body>
+<h2>MoMA Acquisition History for Untitled Works</h2>
+<p><em>Total quantity of untitled works<sup>*</sup> acquired by the Museum of Modern Art in each calendar year between 1935 and 2015</em></p>
+<p><small>Data source: <a href="https://github.com/MuseumofModernArt/collection">github.com/MuseumofModernArt/collection</a></small></p>
+
+<svg></svg>
+
+<p>
+  <small><sup>*</sup>: Works in which the English word "untitled" appears in the title of the accessioned work</small>
+</p>
+
+<script type="text/javascript">
+
+DATE_ACQUIRED_REGEX_US = /(\d{2})-(\d{2})-(\d{4})/;
+DATE_ACQUIRED_REGEX_CONTINENT = /(\d{4})-(\d{2})-(\d{2})/;
+
+function getDate( dateAcquired ) {
+  var parsedDate = DATE_ACQUIRED_REGEX_US.exec( dateAcquired );
+  if ( parsedDate ) {
+    // Note to self: just use Moment if this gets out of hand
+    return {
+      month: +parsedDate[1],
+      day: +parsedDate[2],
+      year: +parsedDate[3]
+    };
+  }
+  // If we made it this far, the first pattern did not match
+  parsedDate = DATE_ACQUIRED_REGEX_CONTINENT.exec( dateAcquired );
+  if ( parsedDate ) {
+    return {
+      year: +parsedDate[1],
+      month: +parsedDate[2],
+      day: +parsedDate[3]
+    };
+  }
+  console.warn( dateAcquired + ' not matched' );
+}
+
+var WIDTH = window.innerWidth > 650 ? 650 : window.innerWidth - 20;
+// var HEIGHT = 520;
+var ROW_HEIGHT = 8;
+
+var svg = d3.select('svg');
+svg.attr( 'width', WIDTH );
+
+d3.csv('untitled.csv', function(artworks) {
+
+  window.art = artworks;
+
+  var artByYearAcquired = d3.nest()
+    .key(function(d) {
+      // dateAcquired e.g. '2001-11-12'
+      return getDate( d.dateAcquired ).year;
+    })
+    .entries(artworks)
+    .sort(function(a, b) {
+      return d3.ascending( +a.key, +b.key);
+    });
+
+  // ROW_HEIGHT per year
+  svg.attr( 'height', artByYearAcquired.length * ROW_HEIGHT );
+
+  var maxWorksForAYear = d3.max( artByYearAcquired, function( year ) {
+    return year.values.length;
+  });
+
+  // window.artByYearAcquired = artByYearAcquired;
+
+  var rects = svg.selectAll('rect').data( artByYearAcquired ).enter().append( 'rect' );
+  rects
+    .attr({
+      fill: 'black',
+      title: function( d ) {
+        return d.key;
+      },
+      y: function( d, i ) {
+        return i * ROW_HEIGHT;
+      },
+      x: 0,
+      width: function( d ) {
+        return d.values.length / maxWorksForAYear * WIDTH;
+      },
+      height: ROW_HEIGHT - 2
+    })
+    .append( 'title' )
+      .text(function( d ) {
+        return d.key;
+      });
+});
+
+</script>
+</body>
+</html>
