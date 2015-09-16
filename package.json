@@ -11,5 +11,8 @@
   "dependencies": {
     "csv": "^0.4.6",
     "lodash": "^3.10.1"
+  },
+  "devDependencies": {
+    "bluebird": "^2.10.0"
   }
 }
