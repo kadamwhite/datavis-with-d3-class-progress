@@ -21,27 +21,27 @@
 DATE_ACQUIRED_REGEX_US = /(\d{2})-(\d{2})-(\d{4})/;
 DATE_ACQUIRED_REGEX_CONTINENT = /(\d{4})-(\d{2})-(\d{2})/;
 
-function getDate( dateAcquired ) {
-  var parsedDate = DATE_ACQUIRED_REGEX_US.exec( dateAcquired );
-  if ( parsedDate ) {
-    // Note to self: just use Moment if this gets out of hand
-    return {
-      month: +parsedDate[1],
-      day: +parsedDate[2],
-      year: +parsedDate[3]
-    };
-  }
-  // If we made it this far, the first pattern did not match
-  parsedDate = DATE_ACQUIRED_REGEX_CONTINENT.exec( dateAcquired );
-  if ( parsedDate ) {
-    return {
-      year: +parsedDate[1],
-      month: +parsedDate[2],
-      day: +parsedDate[3]
-    };
-  }
-  console.warn( dateAcquired + ' not matched' );
-}
+// function getDate( dateAcquired ) {
+//   var parsedDate = DATE_ACQUIRED_REGEX_US.exec( dateAcquired );
+//   if ( parsedDate ) {
+//     // Note to self: just use Moment if this gets out of hand
+//     return {
+//       month: +parsedDate[1],
+//       day: +parsedDate[2],
+//       year: +parsedDate[3]
+//     };
+//   }
+//   // If we made it this far, the first pattern did not match
+//   parsedDate = DATE_ACQUIRED_REGEX_CONTINENT.exec( dateAcquired );
+//   if ( parsedDate ) {
+//     return {
+//       year: +parsedDate[1],
+//       month: +parsedDate[2],
+//       day: +parsedDate[3]
+//     };
+//   }
+//   console.warn( dateAcquired + ' not matched' );
+// }
 
 var WIDTH = window.innerWidth > 650 ? 650 : window.innerWidth - 20;
 // var HEIGHT = 520;
@@ -50,31 +50,49 @@ var ROW_HEIGHT = 8;
 var svg = d3.select('svg');
 svg.attr( 'width', WIDTH );
 
-d3.csv('untitled.csv', function(artworks) {
+// d3.csv('untitled.csv', function(artworks) {
+//
+//   // I was having load issues with the full csv on blocks, so I
+//   // ran the following in Chrome Dev Tools, after loading Lodash
+//   // and letting the CSV load:
+//   //
+//   // window.art = artworks;
+//   // var countByYear = var countByYear = _.countBy( art, function( work ) {
+//   //   return /\d{4}/.exec( work.dateAcquired )[ 0 ]
+//   // });
+//   // copy( _.chain( countByYear )
+//   //   .keys()
+//   //   .sortBy(function( year ) {
+//   //     // Numeric sort on year
+//   //     return +year;
+//   //   })
+//   //   .map(function( year ) {
+//   //     return {
+//   //       year: year,
+//   //       count: countByYear[ year ]
+//   //     };
+//   //   })
+//   //   .map(function( year ) {
+//   //     return year.year + ',' + year.count;
+//   //   })
+//   //   .value().join( '\n' ) )
+//   //
+//   // Pasted the data into works-acquired-by-year.csv
+// });
 
-  window.art = artworks;
-
-  var artByYearAcquired = d3.nest()
-    .key(function(d) {
-      // dateAcquired e.g. '2001-11-12'
-      return getDate( d.dateAcquired ).year;
-    })
-    .entries(artworks)
-    .sort(function(a, b) {
-      return d3.ascending( +a.key, +b.key);
-    });
+// New code, after doing the above:
+d3.csv( 'works-acquired-by-year.csv', function( artByYearAcquired ) {
+  window.art = artByYearAcquired;
 
   // ROW_HEIGHT per year
   svg.attr( 'height', artByYearAcquired.length * ROW_HEIGHT );
 
   var maxWorksForAYear = d3.max( artByYearAcquired, function( year ) {
-    return year.values.length;
+    return +year.worksAcquired;
   });
 
-  // window.artByYearAcquired = artByYearAcquired;
-
-  var rects = svg.selectAll('rect').data( artByYearAcquired ).enter().append( 'rect' );
-  rects
+  var rects = svg.selectAll('rect').data( artByYearAcquired ).enter()
+  .append( 'rect' )
     .attr({
       fill: 'black',
       title: function( d ) {
@@ -85,7 +103,7 @@ d3.csv('untitled.csv', function(artworks) {
       },
       x: 0,
       width: function( d ) {
-        return d.values.length / maxWorksForAYear * WIDTH;
+        return +d.worksAcquired / maxWorksForAYear * WIDTH;
       },
       height: ROW_HEIGHT - 2
     })
