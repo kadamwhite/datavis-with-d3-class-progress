@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+  <title>Untitled Works in the MoMA Collection</title>
+  <script type='text/javascript' src='http://d3js.org/d3.v3.js'></script>
+  <style type='text/css'>
+
+    body {
+      font: 13px/1.38em "helveticaneue", "helvetica neue", helvetica, arial, sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: black;
+      shape-rendering: crispEdges;
+    }
+
+    .axis text {
+      font-family: sans-serif;
+      font-size: 11px;
+    }
+
+  </style>
+</head>
+<body>
+<h2>MoMA Acquisition History</h2>
+<p>
+  <strong>Collection Growth</strong>: Works acquired by the Museum of Modern Art each year since the museum&rsquo;s founding in 1929.
+  <em>(Excludes works for which either the date of creation or date of acquisition is unknown.)</em>
+</p>
+
+<svg></svg>
+
+<p>
+  <small>Data source: <a href='https://github.com/MuseumofModernArt/collection'>github.com/MuseumofModernArt/collection</a></small>
+</p>
+<!--
+<p>
+  <small><sup>*</sup>: Works in which the English word 'untitled' appears in the title of the accessioned work</small>
+</p>
+-->
+<script type='text/javascript'>
+
+DATE_ACQUIRED_REGEX_US = /(\d{2})-(\d{2})-(\d{4})/;
+DATE_ACQUIRED_REGEX_CONTINENT = /(\d{4})-(\d{2})-(\d{2})/;
+
+var WIDTH = window.innerWidth > 650 ? 650 : window.innerWidth - 16;
+var HEIGHT = 900;
+
+var PADDING = {
+  top: 0,
+  right: 40,
+  bottom: 50,
+  left: 40
+};
+
+var svg = d3.select('svg');
+svg.attr({
+  width: WIDTH,
+  height: HEIGHT
+});
+
+
+var xScale = d3.scale.linear().range([
+  0,
+  WIDTH - PADDING.right - PADDING.left
+]);
+var yScale = d3.scale.ordinal().rangeRoundBands([
+  PADDING.top,
+  HEIGHT - PADDING.bottom
+], 0.15);
+
+var xAxis = d3.svg.axis()
+  .scale( xScale )
+  .orient( 'bottom ');
+
+var yAxis = d3.svg.axis()
+  .scale( yScale )
+  .orient( 'left' );
+
+
+d3.csv( 'accessions-by-dept-by-year.csv', function( accessionsByYear ) {
+  // convert all member object values to numbers
+  accessionsByYear = accessionsByYear.map(function( year ) {
+    Object.keys( year ).forEach(function( key ) {
+      year[ key ] = +year[ key ];
+    });
+    return year;
+  });
+
+  window.art = accessionsByYear;
+
+  accessionsByYear.sort(function( a, b ) {
+    return d3.descending( a.year, b.year );
+  });
+
+  var years = accessionsByYear.map(function( d ) { return d.year; });
+  var maxAcquiredInOneYear = d3.max( accessionsByYear, function( d ) {
+    return d.total;
+  });
+
+  xScale.domain([ 0, maxAcquiredInOneYear ]);
+  yScale.domain( years );
+  //   // Descending order of years
+  //   d3.max( years ),
+  //   d3.min( years )
+  // ]);
+
+  var rects = svg.selectAll('rect').data( accessionsByYear ).enter().append( 'rect' )
+    .attr({
+      fill: 'black',
+      title: function( d ) {
+        return d.year;
+      },
+      x: PADDING.left,
+      width: function( d ) {
+        return xScale( d.total );
+      },
+      y: function( d, i ) {
+        return yScale( d.year );
+      },
+      height: yScale.rangeBand()
+    })
+    .append( 'title' )
+      .text(function( d ) {
+        return d.total + ' works acquired in ' + d.year;
+      });
+
+  yAxis.ticks( years.filter(function( year, i ) {
+    return i % 2 !== 0;
+  }) );
+
+  svg.append('g')
+    .attr({
+      class: 'x axis',
+      transform: 'translate(' + PADDING.left + ',' + (HEIGHT - PADDING.bottom) + ')'
+    })
+    .call( xAxis);
+
+  svg.append('g')
+    .attr({
+      class: 'y axis',
+      transform: 'translate(' + ( PADDING.left ) + ',0)'
+    }).call( yAxis );
+});
+
+</script>
+</body>
+</html>
