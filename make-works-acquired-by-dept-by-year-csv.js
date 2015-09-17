@@ -38,6 +38,26 @@ csv.read( __dirname + '/dated-works.csv' ).then(function( data ) {
 
   console.log( _.countBy( data, 'department' ) );
 
+  var columns = [
+    'year',
+    'Architecture & Design',
+    'Drawings',
+    'Film',
+    'Fluxus Collection',
+    'Media and Performance Art',
+    'Painting & Sculpture',
+    'Photography',
+    'Prints & Illustrated Books',
+    'untitled'
+  ];
+
+  function makeEmptyCounts() {
+    return _.reduce( columns, function( counts, columnKey ) {
+      counts[ columnKey ] = 0;
+      return counts;
+    }, {});
+  }
+
   // Sorting is probably unneeded, but it's trivial for an array of years
   // and it provides some security that the generated CSV will be ordered
   var years = _.keys( worksByYear ).sort(function( a, b ) {
@@ -51,21 +71,11 @@ csv.read( __dirname + '/dated-works.csv' ).then(function( data ) {
         memo.untitled = memo.untitled ? memo.untitled + 1 : 1;
       }
       return memo;
-    }, {});
+    }, makeEmptyCounts() );
+
     counts.year = year;
     return counts;
   });
 
-  csv.write( 'works-acquired-by-dept-by-year.csv', years, [
-    'year',
-    'Architecture & Design',
-    'Drawings',
-    'Film',
-    'Fluxus Collection',
-    'Media and Performance Art',
-    'Painting & Sculpture',
-    'Photography',
-    'Prints & Illustrated Books',
-    'untitled'
-  ]);
+  csv.write( 'works-acquired-by-dept-by-year.csv', years, columns );
 });
