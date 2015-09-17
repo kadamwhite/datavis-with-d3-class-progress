@@ -48,6 +48,7 @@ csv.read( __dirname + '/dated-works.csv' ).then(function( data ) {
     'Painting & Sculpture',
     'Photography',
     'Prints & Illustrated Books',
+    'total',
     'untitled'
   ];
 
@@ -73,9 +74,10 @@ csv.read( __dirname + '/dated-works.csv' ).then(function( data ) {
       return memo;
     }, makeEmptyCounts() );
 
+    counts.total = worksByYear[ year ].length;
     counts.year = year;
     return counts;
   });
 
-  csv.write( 'works-acquired-by-dept-by-year.csv', years, columns );
+  csv.write( 'week4/accessions-by-dept-by-year.csv', years, columns );
 });
