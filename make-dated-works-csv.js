@@ -47,9 +47,9 @@ function normalizeDateAcquired( work ) {
 
 var UNTITLED_REGEX = /untitled/i;
 function isUntitled( work ) {
-  if ( work.Artist.substr('Eliot Noyes') > -1 ) {
-    console.log( work );
-  }
+  // if ( work.Artist.substr('Eliot Noyes') > -1 ) {
+  //   console.log( work );
+  // }
   return UNTITLED_REGEX.test( work.Title );
 }
 
@@ -82,7 +82,6 @@ csv.read( __dirname + '/MomaArtworks.csv' ).then(function( data ) {
     .map(function( work ) {
       // These fields are not strictly relevant to my analysis, and are omitted:
       // 'Classification',
-      // 'CreditLine',
       // 'CuratorApproved',
       // 'Dimensions',
       // 'MoMANumber',
@@ -95,6 +94,9 @@ csv.read( __dirname + '/MomaArtworks.csv' ).then(function( data ) {
         medium: work.Medium,
         department: work.Department,
         id: work.ObjectID,
+        // Add some proprties we'd omitted before
+        creditLine: work.CreditLine,
+        classification: work.Classification,
         // Flag whether the work is untitled
         untitled: isUntitled( work ),
         // Normalize the dateAcquired to YYYY-MM-DD

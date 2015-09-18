@@ -74,6 +74,8 @@ csv.read( __dirname + '/dated-works.csv' ).then(function( data ) {
       return memo;
     }, makeEmptyCounts() );
 
+    console.log( year + '\n' );
+    console.log( worksByYear[year].length, counts );
     counts.total = worksByYear[ year ].length;
     counts.year = year;
     return counts;

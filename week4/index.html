@@ -8,6 +8,16 @@
 
     body {
       font: 13px/1.38em "helveticaneue", "helvetica neue", helvetica, arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 4em;
+    }
+
+    .italic {
+      font-style: italic;
+      font-weight: normal;
     }
 
     .axis path,
@@ -17,21 +27,76 @@
       shape-rendering: crispEdges;
     }
 
+    .highlight {
+      color: #e83f2c;
+      fill: #e83f2c;
+    }
+    .regular {
+      fill: 'black';
+    }
+
+    blockquote {
+      font-style: italic;
+    }
+
     .axis text {
+
       font-family: sans-serif;
       font-size: 11px;
+    }
+
+    .notes {
+      max-width: 500px;
+    }
+
+    @media (min-width: 800px) {
+      svg {
+        float: left;
+        margin-right: 20px;
+      }
+      .notes {
+        margin-top: 40px;
+        max-width: 900px;
+      }
+    }
+    @media (min-width: 960px) {
+      body {
+        width: 960px;
+        margin: auto;
+      }
     }
 
   </style>
 </head>
 <body>
-<h2>MoMA Acquisition History</h2>
+<h1>MoMA Acquisition History</h1>
+<h2>Collection Growth</h2>
+<p>Columns represent the number of works acquired by the Museum of Modern Art each year since the museum&rsquo;s founding in 1929.</p>
 <p>
-  <strong>Collection Growth</strong>: Works acquired by the Museum of Modern Art each year since the museum&rsquo;s founding in 1929.
-  <em>(Excludes works for which either the date of creation or date of acquisition is unknown.)</em>
+  <em>Note: works for which either the date of creation or date of acquisition is unknown were excluded from this data set.</em>
 </p>
 
 <svg></svg>
+
+<div class="notes">
+<h2>Notable Acquisitions <small><small class="italic">(by volume, anyway)</small></small></h2>
+<p>The highest peak, in 1964, represents the donation of the <strong class="highlight">Louis E. Stern Collection</strong>, comprising 145 individual printed books with illustrations by artists including Picasso, Chagall and Matisse. Strictly speaking in terms of individual records in the collection data, it is the highest-volume gift in the museum's history.</p>
+<p>From the <a href="https://www.moma.org/momaorg/shared/pdfs/docs/press_archives/3206/releases/MOMA_1963_0118_114.pdf?2010">press release for the donation</a>:</p>
+<blockquote>
+<p>The gift of the Louis E. Stem Collection of Illustrated Books to The Museum of Modern Art, announced today by the trustees of the Louis E. Stern Foundation, is one of the most important ever made to the Museum's Department of Drawings and Prints, according to Alfred H. Barr, Jr., Director of Museum Collections, and William S. Lieberman, Curator of Drawings and Prints.</p></blockquote>
+
+<hr>
+
+<p>The next-highest-volume year is 1968, when MoMA purchased the <strong class="highlight">Abbott/Levy collection</strong> of <a href="https://en.wikipedia.org/wiki/Eug%C3%A8ne_Atget">Eugène Atget's photography</a>, adding 4803 records to the Photography department. Atget was a pioneer of documentary photography, systematically recording images of Paris as the city changed and modernized in the early 1900s. His monograph <em>Atget: Photographe de Paris</em>, published posthumously by Berenice Abbott (of the Abbott/Levy collection), was the first book of photographs to be published simultanously in multiple countries, as related on the <a href="https://www.moma.org/interactives/objectphoto/publications/781.html">MoMA object:photo website</a>.</p>
+
+<hr>
+
+<p>Of the over 130,000 records in the MoMA catalog photographs, books and monographs make up the vast majority (record-for-record), followed by holdings in the Architecture &amp; Design department (which has collected, among other things, <a href="http://www.moma.org/explore/inside_out/2010/03/22/at-moma">the "@" sign</a>) and the Drawing department. <strong>Less than four thousand</strong> records represent paintings and sculptures, the collections for which MoMA is arguably best known.</p>
+
+<p>That the 145 books of the Stern Collection can yield nearly 11,000 individual catalog records is both a testament to the thoroughness of the MoMA's cataloguing, and a reminded that it is difficult to deal with printed works in the same manner as discrete or monolithic artworks such as sculptures and paintings!</p>
+
+</div>
+
 
 <p>
   <small>Data source: <a href='https://github.com/MuseumofModernArt/collection'>github.com/MuseumofModernArt/collection</a></small>
@@ -46,13 +111,13 @@
 DATE_ACQUIRED_REGEX_US = /(\d{2})-(\d{2})-(\d{4})/;
 DATE_ACQUIRED_REGEX_CONTINENT = /(\d{4})-(\d{2})-(\d{2})/;
 
-var WIDTH = window.innerWidth > 650 ? 650 : window.innerWidth - 16;
+var WIDTH = window.innerWidth - 40 > 500 ? 500 : window.innerWidth - 40;
 var HEIGHT = 900;
 
 var PADDING = {
   top: 0,
   right: 40,
-  bottom: 50,
+  bottom: 60,
   left: 40
 };
 
@@ -110,7 +175,12 @@ d3.csv( 'accessions-by-dept-by-year.csv', function( accessionsByYear ) {
 
   var rects = svg.selectAll('rect').data( accessionsByYear ).enter().append( 'rect' )
     .attr({
-      fill: 'black',
+      class: function( d ) {
+        if ( d.year === 1968 || d.year === 1964 ) {
+          return 'highlight';
+        }
+        return 'regular';
+      },
       title: function( d ) {
         return d.year;
       },
@@ -128,9 +198,17 @@ d3.csv( 'accessions-by-dept-by-year.csv', function( accessionsByYear ) {
         return d.total + ' works acquired in ' + d.year;
       });
 
-  yAxis.ticks( years.filter(function( year, i ) {
-    return i % 2 !== 0;
+  // yAxis.tickFormat(function( year, i ) {
+  //   return i % 2 ? '' : year;
+  // });
+  yAxis.tickValues( years.filter(function( year, i ) {
+    return i % 2 === 0;
   }) );
+
+  xAxis.tickFormat( function( a, b ) {
+    console.log( a, b );
+    return a > 0 ? (a + '').replace( '000', 'k' ) : a;
+  });
 
   svg.append('g')
     .attr({
@@ -142,8 +220,16 @@ d3.csv( 'accessions-by-dept-by-year.csv', function( accessionsByYear ) {
   svg.append('g')
     .attr({
       class: 'y axis',
-      transform: 'translate(' + ( PADDING.left ) + ',0)'
+      transform: 'translate(' + PADDING.left + ',0)'
     }).call( yAxis );
+
+  svg.append( 'text' ).attr({
+    // 'text-anchor': 'middle',
+    'font-weight': 'bold',
+    transform: 'translate(' + PADDING.left + ',' +  (HEIGHT - PADDING.bottom / 3) + ')',
+    fill: 'black'
+  }).text( 'MoMA Catalog Records Added Per Year' );
+
 });
 
 </script>
